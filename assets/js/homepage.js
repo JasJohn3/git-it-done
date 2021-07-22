@@ -1,3 +1,4 @@
+var languageButtonsEl = document.querySelector("#language-buttons");
 var userFormEl = document.querySelector("#user-form");
 var nameInputEl = document.querySelector("#username");
 var repoContainerEl = document.querySelector("#repos-container");
@@ -30,6 +31,18 @@ let formSubmitHandler = function(event){
     nameInputEl.value = "";
   }else{
     alert("Please Enter a Github User Name!");
+  }
+};
+
+var buttonClickHandler = function(event) {
+  // get the language attribute from the clicked element
+  var language = event.target.getAttribute("data-language");
+
+  if (language) {
+    getFeaturedRepos(language);
+
+    // clear old content
+    repoContainerEl.textContent = "";
   }
 };
 
@@ -77,5 +90,19 @@ var displayRepos = function(repos, searchTerm) {
   repoContainerEl.appendChild(repoEl);
 }
 };
+var getFeaturedRepos = function(language) {
+  var apiUrl = "https://api.github.com/search/repositories?q=" + language + "+is:featured&sort=help-wanted-issues";
+
+  fetch(apiUrl).then(function(response) {
+    if (response.ok) {
+      response.json().then(function(data) {
+        displayRepos(data.items, language);
+      });
+    } else {
+      alert('Error: GitHub User Not Found');
+    }
+  });
+};
 
 userFormEl.addEventListener("submit", formSubmitHandler);
+languageButtonsEl.addEventListener("click", buttonClickHandler);
